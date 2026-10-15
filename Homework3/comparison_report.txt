@@ -1,0 +1,238 @@
+Homework 3: Simulator
+Report
+
+Design policies: FCFS and SJF are non-preemptive. RR uses q=4. Priority is non-preemptive,
+lower numeric priority is higher priority, ties by arrival then input order.
+MLFQ uses Q0/Q1/Q2 with quanta 4/8/16, full-slice demotion and periodic boosts at t=50.
+Priority aging can be enabled with --aging 5, but is disabled for the exact lecture benchmark.
+
+Sample
+
+PID,arrival,burst,priority
+P1,0,6,1
+P2,0,2,3
+P3,0,8,2
+P4,0,3,3
+
+Comparison
+
+Algorithm          Avg Waiting  Avg Turnaround  Avg Response
+FCFS               7.50         12.25           7.50        
+SJF                4.50         9.25            4.50        
+Round Robin (q=4)  8.50         13.25           5.00        
+Priority           9.00         13.75           9.00        
+MLFQ (4/8/16)      8.50         13.25           5.00
+
+------------------------------------------------------------
+FCFS
+
+Algorithm: FCFS
+
+Execution timeline: P1[0-6] | P2[6-8] | P3[8-16] | P4[16-19]
+
+PID  Arrival  Burst  Priority  Start  Completion  Waiting  Turnaround  Response
+P1   0        6      1         0      6           0        6           0       
+P2   0        2      3         6      8           6        8           6       
+P3   0        8      2         8      16          8        16          8       
+P4   0        3      3         16     19          16       19          16      
+
+Average Waiting Time:    7.50
+Average Turnaround Time: 12.25
+Average Response Time:   7.50
+
+------------------------------------------------------------
+SJF
+
+Algorithm: SJF
+
+Execution timeline: P2[0-2] | P4[2-5] | P1[5-11] | P3[11-19]
+
+PID  Arrival  Burst  Priority  Start  Completion  Waiting  Turnaround  Response
+P1   0        6      1         5      11          5        11          5       
+P2   0        2      3         0      2           0        2           0       
+P3   0        8      2         11     19          11       19          11      
+P4   0        3      3         2      5           2        5           2       
+
+Average Waiting Time:    4.50
+Average Turnaround Time: 9.25
+Average Response Time:   4.50
+
+------------------------------------------------------------
+RR
+
+Algorithm: RR
+
+Execution timeline: P1[0-4] | P2[4-6] | P3[6-10] | P4[10-13] | P1[13-15] | P3[15-19]
+
+PID  Arrival  Burst  Priority  Start  Completion  Waiting  Turnaround  Response
+P1   0        6      1         0      15          9        15          0       
+P2   0        2      3         4      6           4        6           4       
+P3   0        8      2         6      19          11       19          6       
+P4   0        3      3         10     13          10       13          10      
+
+Average Waiting Time:    8.50
+Average Turnaround Time: 13.25
+Average Response Time:   5.00
+
+------------------------------------------------------------
+PRIORITY
+
+Algorithm: PRIORITY
+
+Execution timeline: P1[0-6] | P3[6-14] | P2[14-16] | P4[16-19]
+
+PID  Arrival  Burst  Priority  Start  Completion  Waiting  Turnaround  Response
+P1   0        6      1         0      6           0        6           0       
+P2   0        2      3         14     16          14       16          14      
+P3   0        8      2         6      14          6        14          6       
+P4   0        3      3         16     19          16       19          16      
+
+Average Waiting Time:    9.00
+Average Turnaround Time: 13.75
+Average Response Time:   9.00
+
+------------------------------------------------------------
+MLFQ
+
+Algorithm: MLFQ
+
+Execution timeline: P1[0-4] | P2[4-6] | P3[6-10] | P4[10-13] | P1[13-15] | P3[15-19]
+
+PID  Arrival  Burst  Priority  Start  Completion  Waiting  Turnaround  Response
+P1   0        6      1         0      15          9        15          0       
+P2   0        2      3         4      6           4        6           4       
+P3   0        8      2         6      19          11       19          6       
+P4   0        3      3         10     13          10       13          10      
+
+Average Waiting Time:    8.50
+Average Turnaround Time: 13.25
+Average Response Time:   5.00
+
+MLFQ events:
+Time  PID  Queue  Action                         
+0     P1   Q0     Full quantum (4), demoted to Q1
+4     P2   Q0     Finished                       
+6     P3   Q0     Full quantum (4), demoted to Q1
+10    P4   Q0     Finished                       
+13    P1   Q1     Finished                       
+15    P3   Q1     Finished
+
+==============================================================================
+CUSTOM WORKLOAD
+==============================================================================
+PID,arrival,burst,priority
+A,0,7,3
+B,2,4,1
+C,4,9,4
+D,6,3,2
+E,13,5,3
+
+FIVE-ALGORITHM COMPARISON
+Algorithm          Avg Waiting  Avg Turnaround  Avg Response
+FCFS               7.20         12.80           7.20        
+SJF                5.00         10.60           5.00        
+Round Robin (q=4)  8.60         14.20           4.80        
+Priority           5.20         10.80           5.20        
+MLFQ (4/8/16)      9.40         15.00           2.80
+
+------------------------------------------------------------
+FCFS
+
+Algorithm: FCFS
+
+Execution timeline: A[0-7] | B[7-11] | C[11-20] | D[20-23] | E[23-28]
+
+PID  Arrival  Burst  Priority  Start  Completion  Waiting  Turnaround  Response
+A    0        7      3         0      7           0        7           0       
+B    2        4      1         7      11          5        9           5       
+C    4        9      4         11     20          7        16          7       
+D    6        3      2         20     23          14       17          14      
+E    13       5      3         23     28          10       15          10      
+
+Average Waiting Time:    7.20
+Average Turnaround Time: 12.80
+Average Response Time:   7.20
+
+------------------------------------------------------------
+SJF
+
+Algorithm: SJF
+
+Execution timeline: A[0-7] | D[7-10] | B[10-14] | E[14-19] | C[19-28]
+
+PID  Arrival  Burst  Priority  Start  Completion  Waiting  Turnaround  Response
+A    0        7      3         0      7           0        7           0       
+B    2        4      1         10     14          8        12          8       
+C    4        9      4         19     28          15       24          15      
+D    6        3      2         7      10          1        4           1       
+E    13       5      3         14     19          1        6           1       
+
+Average Waiting Time:    5.00
+Average Turnaround Time: 10.60
+Average Response Time:   5.00
+
+------------------------------------------------------------
+RR
+
+Algorithm: RR
+
+Execution timeline: A[0-4] | B[4-8] | C[8-12] | A[12-15] | D[15-18] | C[18-22] | E[22-26] | C[26-27] | E[27-28]
+
+PID  Arrival  Burst  Priority  Start  Completion  Waiting  Turnaround  Response
+A    0        7      3         0      15          8        15          0       
+B    2        4      1         4      8           2        6           2       
+C    4        9      4         8      27          14       23          4       
+D    6        3      2         15     18          9        12          9       
+E    13       5      3         22     28          10       15          9       
+
+Average Waiting Time:    8.60
+Average Turnaround Time: 14.20
+Average Response Time:   4.80
+
+------------------------------------------------------------
+PRIORITY
+
+Algorithm: PRIORITY
+
+Execution timeline: A[0-7] | B[7-11] | D[11-14] | E[14-19] | C[19-28]
+
+PID  Arrival  Burst  Priority  Start  Completion  Waiting  Turnaround  Response
+A    0        7      3         0      7           0        7           0       
+B    2        4      1         7      11          5        9           5       
+C    4        9      4         19     28          15       24          15      
+D    6        3      2         11     14          5        8           5       
+E    13       5      3         14     19          1        6           1       
+
+Average Waiting Time:    5.20
+Average Turnaround Time: 10.80
+Average Response Time:   5.20
+
+------------------------------------------------------------
+MLFQ
+
+Algorithm: MLFQ
+
+Execution timeline: A[0-4] | B[4-8] | C[8-12] | D[12-15] | E[15-19] | A[19-22] | C[22-27] | E[27-28]
+
+PID  Arrival  Burst  Priority  Start  Completion  Waiting  Turnaround  Response
+A    0        7      3         0      22          15       22          0       
+B    2        4      1         4      8           2        6           2       
+C    4        9      4         8      27          14       23          4       
+D    6        3      2         12     15          6        9           6       
+E    13       5      3         15     28          10       15          2       
+
+Average Waiting Time:    9.40
+Average Turnaround Time: 15.00
+Average Response Time:   2.80
+
+MLFQ events:
+Time  PID  Queue  Action                         
+0     A    Q0     Full quantum (4), demoted to Q1
+4     B    Q0     Finished                       
+8     C    Q0     Full quantum (4), demoted to Q1
+12    D    Q0     Finished                       
+15    E    Q0     Full quantum (4), demoted to Q1
+19    A    Q1     Finished                       
+22    C    Q1     Finished                       
+27    E    Q1     Finished
+
