@@ -1,0 +1,11 @@
+HW4 Comparison
+
+Both versions use 3 producers, 3 consumers, a buffer capacity of 2, and 5 items per producer (15 items total). Both consumed all 15 items and shut down without leaving items in the buffer.
+
+The threading version uses queue.Queue to share data between threads in the same process. The multiprocessing version uses multiprocessing.JoinableQueue because separate processes do not share ordinary Python memory. Passing items between processes adds serialization and communication overhead.
+
+Sample run on my machine:
+Threading: 0.0040 seconds
+Multiprocessing: 0.0568 seconds
+
+The GIL prevents Python threads from executing CPU-bound Python code in parallel. Separate processes have separate interpreters and can use multiple CPU cores. This small queue-based workload is not CPU-intensive, so multiprocessing overhead can outweigh any benefit. Timings vary between runs.
